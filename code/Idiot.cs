@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using TerrorTown;
 using Sandbox;
 
 namespace TerrorTown
 {
     public partial class Idiot : BaseTeam
     {
-        public static readonly int TimeToReveal = 10;
+        // How long it takes for the idiot to be known he is a traitor. Default is 360 / 6 = 60.
+        public static readonly int TimeToReveal = MyGame.RoundTime / 6;
         public override TeamAlignment TeamAlignment
         {
             get
@@ -39,7 +35,8 @@ namespace TerrorTown
                 }
                 else if (MyGame.Current.RoundState != RoundState.Ending)
                 {
-                    return "Innocent (idiot)";
+                    // Name cannot be "Innocent" because of various TeamName checks
+                    return " Innocent ";
                 }
                 return "Idiot";
             }
@@ -69,13 +66,13 @@ namespace TerrorTown
                 TimeSince roundtime = MyGame.Current.TimeSinceRoundStateChanged;
                 if (roundtime > TimeToReveal)
                 {
-                    return TeamMemberVisibility.Alignment;
+                    return TeamMemberVisibility.Alignment | TeamMemberVisibility.PublicWhenConfirmedDead;
                 }
                 else if (MyGame.Current.RoundState != RoundState.Ending)
                 {
-                    return TeamMemberVisibility.None;
+                    return TeamMemberVisibility.None | TeamMemberVisibility.PublicWhenConfirmedDead;
                 }
-                return TeamMemberVisibility.Alignment;
+                return TeamMemberVisibility.Alignment | TeamMemberVisibility.PublicWhenConfirmedDead;
             }
         }
 
@@ -96,29 +93,10 @@ namespace TerrorTown
         {
             if (!MyGame.PreventWin && ShouldWin())
             {
-                
-                TimeSince roundtime = MyGame.Current.TimeSinceRoundStateChanged;
-                if (roundtime < TimeToReveal && MyGame.Current.RoundState != RoundState.Ending)
-                {
-                    // var teams = (from i in Teams.RegisteredTeams
-                    //                   where i.GetType() != typeof(Spectator)
-                    //                   where i.TeamAlignment == TeamAlignment.Traitor && i != this
-                    //                   select i).ToList();
-                    //foreach (var team in teams)
-                    //{
-                    //    MyGame.Current.OnTeamWin(team);
-                    //}
-                    //MyGame.PreventWin = true;
-                }
                 MyGame.Current.RoundState = RoundState.Ending;
+                //IdiotManager.IdiotExistsUnrevealed = false;
                 MyGame.Current.OnTeamWin(this);
             }
         }
-
-        //[Event("Game.Round.End")]
-        //public static void ResetGamePreventWin()
-        //{
-        //    MyGame.PreventWin = false;
-        //}
     }
 }
