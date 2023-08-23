@@ -55,6 +55,30 @@ namespace TerrorTown
             }
         }
 
+        public override bool CanSeePrivateTime 
+        { 
+            get 
+            {
+                if (IdiotManager.IdiotRevealed)
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        public override bool CanSeeMIA
+        {
+            get
+            {
+                if (IdiotManager.IdiotRevealed)
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
+
         public override IList<string> AdversaryTeams => (from i in Teams.RegisteredTeams
                                                          where i.GetType() != typeof(Spectator)
                                                          where i.TeamAlignment != TeamAlignment.NoEnemies && i.TeamAlignment != TeamAlignment.Traitor && i != this
@@ -72,8 +96,12 @@ namespace TerrorTown
         {
             if (!MyGame.PreventWin && ShouldWin())
             {
-                IdiotManager.IdiotRevealed = true;
-                MyGame.Current.OnTeamWin(this);
+                Idiot idiotTeam = Teams.RegisteredTeams.OfType<Idiot>().FirstOrDefault();
+                if (idiotTeam?.Players.Count == 1)
+                {
+                    IdiotManager.IdiotRevealed = true;
+                    MyGame.Current.OnTeamWin(this);
+                }
             }
         }
     }
