@@ -6,21 +6,15 @@ namespace TerrorTown
 {
     public partial class Idiot : BaseTeam
     {
-        // How long it takes for the idiot to be known he is a traitor. Default is 360 / 6 = 60.
-        public static readonly int TimeToReveal = MyGame.RoundTime / 6;
         public override TeamAlignment TeamAlignment
         {
             get
             {
-                TimeSince roundtime = MyGame.Current.TimeSinceRoundStateChanged;
-                if (roundtime > TimeToReveal || MyGame.Current.RoundState == RoundState.Ending)
+                if (IdiotManager.IdiotRevealed)
                 {
                     return TeamAlignment.Traitor;
                 }
-                else
-                {
-                    return TeamAlignment.NoAllies;
-                }
+                return TeamAlignment.NoAllies;
             }
         }
 
@@ -28,17 +22,12 @@ namespace TerrorTown
         {
             get
             {
-                TimeSince roundtime = MyGame.Current.TimeSinceRoundStateChanged;
-                if (roundtime > TimeToReveal)
+                if (IdiotManager.IdiotRevealed)
                 {
                     return "Idiot";
                 }
-                else if (MyGame.Current.RoundState != RoundState.Ending)
-                {
-                    // Name cannot be "Innocent" because of various TeamName checks
-                    return " Innocent ";
-                }
-                return "Idiot";
+                // Name cannot be "Innocent" because of various TeamName checks.
+                return " Innocent ";
             }
         }
 
@@ -46,16 +35,11 @@ namespace TerrorTown
         {
             get 
             {
-                TimeSince roundtime = MyGame.Current.TimeSinceRoundStateChanged;
-                if (roundtime > TimeToReveal)
+                if (IdiotManager.IdiotRevealed)
                 {
                     return Color.FromRgb(0xFF4F3F);
                 }
-                else if (MyGame.Current.RoundState != RoundState.Ending)
-                {
-                    return Color.Green;
-                }
-                return Color.FromRgb(0xFF4F3F);
+                return Color.Green;
             }
         }
 
@@ -63,16 +47,11 @@ namespace TerrorTown
         {
             get
             {
-                TimeSince roundtime = MyGame.Current.TimeSinceRoundStateChanged;
-                if (roundtime > TimeToReveal)
+                if (IdiotManager.IdiotRevealed)
                 {
                     return TeamMemberVisibility.Alignment | TeamMemberVisibility.PublicWhenConfirmedDead;
                 }
-                else if (MyGame.Current.RoundState != RoundState.Ending)
-                {
-                    return TeamMemberVisibility.None | TeamMemberVisibility.PublicWhenConfirmedDead;
-                }
-                return TeamMemberVisibility.Alignment | TeamMemberVisibility.PublicWhenConfirmedDead;
+                return TeamMemberVisibility.None | TeamMemberVisibility.PublicWhenConfirmedDead;
             }
         }
 
@@ -93,8 +72,7 @@ namespace TerrorTown
         {
             if (!MyGame.PreventWin && ShouldWin())
             {
-                MyGame.Current.RoundState = RoundState.Ending;
-                //IdiotManager.IdiotExistsUnrevealed = false;
+                IdiotManager.IdiotRevealed = true;
                 MyGame.Current.OnTeamWin(this);
             }
         }
