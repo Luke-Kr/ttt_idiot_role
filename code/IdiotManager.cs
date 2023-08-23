@@ -15,7 +15,11 @@ namespace TerrorTown
         public static float IdiotChance { get; set; } = 0.9f;
         public static bool IdiotRevealed { get; set; } = true;
 
-        // Hope we can remove this in the future
+        // How long it takes for the idiot to be known he is a traitor. Default is 90.
+        [ConVar.Replicated("idiot_time_to_reveal", Min = 0)]
+        public static int TimeToReveal { get; set; } = 90;
+
+        // Hope we can remove this in the future.
         private static bool IdiotBought { get; set; } = false;
 
         [Event("Game.Team.PostSelection")]
@@ -54,6 +58,7 @@ namespace TerrorTown
             }
         }
         
+        // This function might not be necessary but it can't hurt.
         [Event("Game.Round.Ending")]
         public static void RoundEnding(MyGame _)
         {
@@ -63,9 +68,15 @@ namespace TerrorTown
         [Event("Player.PostOnKilled")]
         public static void SetRagdollValues (DamageInfo _, Player ply)
         {
-            Corpse corpse = ply.Corpse as Corpse;
-            corpse.TeamName = "Idiot";
-            corpse.TeamColour = Color.FromRgb(0xFF4F3F);
+            Idiot idiotTeam = Teams.RegisteredTeams.OfType<Idiot>().FirstOrDefault();
+            TerrorTown.Player idiotPly = idiotTeam?.Players.FirstOrDefault();
+            if (idiotPly == ply)
+            {
+                Corpse corpse = ply.Corpse as Corpse;
+                corpse.TeamName = "Idiot";
+                corpse.TeamColour = Color.FromRgb(0xFF4F3F);
+                IdiotRevealed = true;
+            }
         }
 
         [GameEvent.Tick.Server]
@@ -75,7 +86,7 @@ namespace TerrorTown
 
             if (!IdiotRevealed)
             {
-                if (MyGame.Current.TimeSinceRoundStateChanged > Idiot.TimeToReveal && MyGame.Current.RoundState == RoundState.Started)
+                if (MyGame.Current.TimeSinceRoundStateChanged > TimeToReveal && MyGame.Current.RoundState == RoundState.Started)
                 {
                     Idiot idiotTeam = Teams.RegisteredTeams.OfType<Idiot>().FirstOrDefault();
                     TerrorTown.Player ply = idiotTeam?.Players.FirstOrDefault();
@@ -90,7 +101,7 @@ namespace TerrorTown
         {
             if (Input.Pressed("View"))
             {
-                if (MyGame.Current.TimeSinceRoundStateChanged > Idiot.TimeToReveal && MyGame.Current.RoundState == RoundState.Started)
+                if (IdiotRevealed && Game.LocalPawn is TerrorTown.Player ply && ply.TeamName == "Idiot" )
                 {
                     ConsoleSystem.Run("idiot_simulate_buy_menu");
                 }
@@ -114,7 +125,7 @@ namespace TerrorTown
         {
             if (ConsoleSystem.Caller.Pawn is TerrorTown.Player ply && ply.Team.GetType() == typeof(Idiot) && !IdiotBought)
             {
-                if (MyGame.Current.TimeSinceRoundStateChanged > Idiot.TimeToReveal && MyGame.Current.RoundState == RoundState.Started)
+                if (IdiotRevealed)
                 {
                     new Radar().Touch(ply);
                     new BodyArmour().Touch(ply);
