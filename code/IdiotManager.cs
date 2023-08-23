@@ -8,7 +8,7 @@ using Sandbox;
 
 namespace TerrorTown
 {
-    public static class IdiotManager
+    public static partial class IdiotManager
     {
         // Default chance is 100% while testing, change before sending it to live!
         [ConVar.Replicated("idiot_role_chance", Max = 1, Min = 0)]
@@ -19,8 +19,8 @@ namespace TerrorTown
         [ConVar.Replicated("idiot_time_to_reveal", Min = 0)]
         public static int TimeToReveal { get; set; } = 90;
 
-        // Hope we can remove this in the future.
-        private static bool IdiotBought { get; set; } = false;
+		// Hope we can remove this in the future.
+        public static bool IdiotBought { get; set; } = false;
 
         [Event("Game.Team.PostSelection")]
         public static void ChangeToIdiot()
@@ -55,8 +55,15 @@ namespace TerrorTown
                 teamIdiot.AddPlayer(ply);
                 IdiotRevealed = false;
                 IdiotBought = false;
+				ResetVars();
             }
         }
+
+		[ClientRpc]
+		public static void ResetVars()
+		{
+			IdiotBought = false;
+		}
         
         // This function might not be necessary but it can't hurt.
         [Event("Game.Round.Ending")]
@@ -96,6 +103,8 @@ namespace TerrorTown
             }
         }
 
+
+
         [GameEvent.Tick.Client]
         public static void GameTickClient()
         {
@@ -103,10 +112,23 @@ namespace TerrorTown
             {
                 if (IdiotRevealed && Game.LocalPawn is TerrorTown.Player ply && ply.TeamName == "Idiot" )
                 {
-                    ConsoleSystem.Run("idiot_simulate_buy_menu");
+                    ConsoleSystem.Run( "idiot_toggle_ui" );
                 }
             }
         }
+
+		[ConCmd.Client("idiot_toggle_ui")]
+		public static void ToggleUI()
+		{
+			// Repeat the check for when funny people try to open it via console.
+			if ( IdiotRevealed && Game.LocalPawn is TerrorTown.Player ply && ply.TeamName == "Idiot" )
+			{
+				IdiotBuyMenu panel = Game.RootPanel.ChildrenOfType<IdiotBuyMenu>().FirstOrDefault();
+				if ( panel != null ) { panel.Delete(); return; }
+				if ( IdiotBought ) return;
+				Game.RootPanel.AddChild<IdiotBuyMenu>();
+			}
+		}
 
         [Event("Game.Initialized")]
         public static void GameInitialized(MyGame _)

@@ -1,0 +1,118 @@
+@using Sandbox;
+@using Sandbox.UI;
+@using System;
+@using System.Collections.Generic;
+@using TerrorTown;
+@using System.Linq;
+@inherits Panel
+
+<style>
+    .top-bar {
+        width: 100%;
+        min-height: 6vh;
+        display: flex;         
+        justify-content: space-between; /* Align elements to the start and end */
+        align-items: center; /* Center elements vertically */
+        background-color: #333;
+    }
+
+    .close {
+        text-align: right;
+        font-size: 32px;
+        width: 4%;
+        height: 100%;
+        background-image: url("/ui/close.png"); /* Set the background image URL */
+        background-size: contain; /* Add this line to fit the image within the container */
+        background-repeat: no-repeat; /* Add this line to prevent repetition */
+        background-position: center; /* Add this line to center the image */
+        padding: 5px;
+        cursor: pointer;
+    }
+
+    .bg {
+        position: absolute;
+        background-color: rgba(100, 100, 100, 0.65);
+        width: 75vw;
+        height: 65vh;
+        left: 5vw;
+        top: 10vh;
+        display: flex;          
+        flex-direction: column;
+        overflow: hidden;
+        pointer-events: all;
+    }
+
+    .hello {
+        font-size: 32px;
+        color: white;
+        text-shadow: 2px 2px 10px black;
+        min-height: 62px;
+    }
+
+    .button {
+        background-color: rgba(50, 150, 50, 0.9);
+        color: white;
+        padding: 10px;
+        text-align: center;
+        cursor: pointer;
+        border-radius: 4px;
+        min-height: 62px;
+        max-height: 102px;
+        text-overflow: ellipsis;
+        width: 100%;
+        flex-shrink: 0;
+    }
+
+    .button:hover {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    .close-image {
+        max-width: 100%;
+        max-height: 100%;
+    }
+
+    .top-link-container {
+        display: flex;
+    }
+
+    .top-link:last-child {
+        margin-right: 1px;
+    }
+</style>
+
+<root>
+    <div class="bg">
+        <div class="top-bar">
+            <div class="top-link-container">
+            </div>
+            <div class="close" onmousedown=@ToggleUI>
+            </div>
+        </div>
+        <div style="background-color: #333; padding: 10px; margin: 10px;" class="hello">
+            We can't add the traitor shop to something that is not a traitor, so you can only simulate buying body armor and radar. (makes pickup noise)
+        </div>
+        <div class="hello button" style="width: 90%; margin: 10px; max-width: 100%; justify-content: center; align-self: center; border-radius: 10px;" onmousedown=@Submit>
+            Buy Body Armor and Radar
+        </div>
+
+    </div>
+</root>
+
+@code
+{
+
+    private void Submit()
+    {
+        // Set this variable clientside
+        IdiotManager.IdiotBought = true;
+        ConsoleSystem.Run("idiot_simulate_buy_menu");
+        ConsoleSystem.Run("idiot_toggle_ui");
+    }
+
+    private void ToggleUI()
+    {
+        ConsoleSystem.Run("idiot_toggle_ui");
+    }
+}
