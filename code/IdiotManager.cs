@@ -10,16 +10,21 @@ namespace TerrorTown
 {
     public static partial class IdiotManager
     {
-        // Default chance is 100% while testing, change before sending it to live!
+        // Chance that one of the traitors will be an idiot. Default is 25%.
         [ConVar.Replicated("idiot_role_chance", Max = 1, Min = 0)]
-        public static float IdiotChance { get; set; } = 0.9f;
+        public static float IdiotChance { get; set; } = 0.25f;
         public static bool IdiotRevealed { get; set; } = true;
 
         // How long it takes for the idiot to be known he is a traitor. Default is 90.
         [ConVar.Replicated("idiot_time_to_reveal", Min = 0)]
         public static int TimeToReveal { get; set; } = 90;
 
-		// Hope we can remove this in the future.
+        // Upper limit on how much the time to reveal will be randomly offset. Default is 10.
+        [ConVar.Replicated("idiot_reveal_offset", Min = 0)]
+        public static int RevealOffset { get; set; } = 10;
+        private static int RealTimeToReveal { get; set; }
+
+        // Hope we can remove this in the future.
         public static bool IdiotBought { get; set; } = false;
 
         [Event("Game.Team.PostSelection")]
@@ -53,6 +58,7 @@ namespace TerrorTown
 
                 teamTraitor.RemovePlayer(ply);
                 teamIdiot.AddPlayer(ply);
+                RealTimeToReveal = TimeToReveal + (int) (RevealOffset * 2 * Game.Random.Float()) - RevealOffset;
                 IdiotRevealed = false;
                 IdiotBought = false;
 				ResetVars();
@@ -89,11 +95,9 @@ namespace TerrorTown
         [GameEvent.Tick.Server]
         public static void GameTickServer()
         {
-            Log.Info(IdiotRevealed);
-
             if (!IdiotRevealed)
             {
-                if (MyGame.Current.TimeSinceRoundStateChanged > TimeToReveal && MyGame.Current.RoundState == RoundState.Started)
+                if (MyGame.Current.TimeSinceRoundStateChanged > RealTimeToReveal && MyGame.Current.RoundState == RoundState.Started)
                 {
                     Idiot idiotTeam = Teams.RegisteredTeams.OfType<Idiot>().FirstOrDefault();
                     TerrorTown.Player ply = idiotTeam?.Players.FirstOrDefault();
