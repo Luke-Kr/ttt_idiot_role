@@ -7,7 +7,7 @@
   "Schema": 1,
   "HasAssets": true,
   "AssetsPath": "",
-  "Resources": null,
+  "Resources": "\nui/close.png\nui/world/idiot.png\nsounds/uranidiotsingle.mp3",
   "MenuResources": null,
   "HasCode": true,
   "CodePath": "/code/",

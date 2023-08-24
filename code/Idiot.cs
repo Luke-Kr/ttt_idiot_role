@@ -79,7 +79,19 @@ namespace TerrorTown
             }
         }
 
-        public override IList<string> AdversaryTeams => (from i in Teams.RegisteredTeams
+		public override bool HasTeamVoiceChat
+		{
+			get
+			{
+				if ( IdiotManager.IdiotRevealed )
+				{
+					return true;
+				}
+				return false;
+			}
+		}
+
+		public override IList<string> AdversaryTeams => (from i in Teams.RegisteredTeams
                                                          where i.GetType() != typeof(Spectator)
                                                          where i.TeamAlignment != TeamAlignment.NoEnemies && i.TeamAlignment != TeamAlignment.Traitor && i != this
                                                          select i.TeamName).ToList();
