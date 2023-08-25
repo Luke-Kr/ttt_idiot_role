@@ -11,16 +11,16 @@ namespace TerrorTown
     public static partial class IdiotManager
     {
         // Chance that one of the traitors will be an idiot. Default is 25%.
-        [ConVar.Replicated("idiot_role_chance", Max = 1, Min = 0)]
+        [ConVar.Replicated("idiot_role_chance", Max = 1, Min = 0, Help = "Chance that one of the traitors will be an idiot. Default is 25%.", Saved = true)]
         public static float IdiotChance { get; set; } = 0.25f;
         public static bool IdiotRevealed { get; set; } = true;
 
         // How long it takes for the idiot to be known he is a traitor. Default is 90.
-        [ConVar.Replicated("idiot_time_to_reveal", Min = 0)]
+        [ConVar.Replicated("idiot_time_to_reveal", Min = 0, Help = "How long it takes for the idiot to be known he is a traitor. Default is 90.", Saved = true)]
         public static int TimeToReveal { get; set; } = 90;
 
         // Upper limit on how much the time to reveal will be randomly offset. Default is 10.
-        [ConVar.Replicated("idiot_reveal_offset", Min = 0)]
+        [ConVar.Replicated("idiot_reveal_offset", Min = 0, Help = "Upper limit on how much the time to reveal will be randomly offset. Default is 10.", Saved = true)]
         public static int RevealOffset { get; set; } = 10;
         private static int RealTimeToReveal { get; set; }
 
