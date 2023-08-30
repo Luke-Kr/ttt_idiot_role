@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using Sandbox;
 
 namespace TerrorTown
@@ -90,6 +89,30 @@ namespace TerrorTown
 				return false;
 			}
 		}
+
+        public override bool EnableBuyMenu
+        {
+            get
+            {
+                if (IdiotManager.IdiotRevealed)
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        public override bool BuyMenuTraitorItems
+        {
+            get
+            {
+                if (IdiotManager.IdiotRevealed)
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
 
         public override string VictimKillMessage => "You were killed by {0}. They were the Idiot";
         public override string RoleDescription => "You are an innocent Terrorist! But there are traitors around... Who can you trust, and who is out to fill you with bullets?\r\n\r\nWatch your back and work with your comrades to get out of this alive!";
